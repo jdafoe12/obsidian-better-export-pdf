@@ -442,7 +442,7 @@ export async function exportToPDF(
     await fs.writeFile(outputPath, data); // Save to fixed output path
 
     // Print the generated PDF using the lp command
-    exec(`lp ${outputPath}`, (error, stdout, stderr) => {
+    exec(`lp -o sides=two-sided-long-edge ${outputPath}`, (error, stdout, stderr) => {
       if (error) {
         console.error(`Error printing PDF: ${error.message}`);
         return;
