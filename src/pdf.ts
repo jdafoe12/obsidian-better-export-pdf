@@ -7,6 +7,11 @@ import { TreeNode, getHeadingTree } from "./utils";
 import { PageSizeType, TConfig } from "./modal";
 import { BetterExportPdfPluginSettings } from "./main";
 
+//jdafoe
+import { exec } from 'child_process';
+const outputPath = '/temp/temp.pdf';  // Fixed output path
+// end jdafoe
+
 interface TPosition {
   [key: string]: number[];
 }
@@ -361,8 +366,8 @@ export function setMetadata(
   pdfDoc.setModificationDate(new Date(updated_at ?? new Date()));
 }
 
+// jdafoe
 export async function exportToPDF(
-  outputFile: string,
   config: TConfig & BetterExportPdfPluginSettings,
   w: WebviewTag,
   doc: Document,
@@ -415,7 +420,6 @@ export async function exportToPDF(
       right: 0.1,
     };
   } else if (config.marginType == "3") {
-    // Custom Margin
     printOptions["margins"] = {
       marginType: "custom",
       top: parseFloat(config["marginTop"] ?? "0") / 25.4,
@@ -435,16 +439,33 @@ export async function exportToPDF(
       maxLevel: parseInt(config?.maxLevel ?? "6"),
     });
 
-    await fs.writeFile(outputFile, data);
+    await fs.writeFile(outputPath, data); // Save to fixed output path
+
+    // Print the generated PDF using the lp command
+    exec(`lp ${outputPath}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error printing PDF: ${error.message}`);
+        return;
+      }
+      console.log(`PDF sent to printer: ${stdout}`);
+      // Delete the PDF after printing
+      fs.unlink(outputPath).then(() => {
+        console.log("PDF file deleted: " + outputPath);
+      }).catch(err => {
+        console.error("Error deleting PDF: " + err);
+      });
+    });
 
     if (config.open) {
       // @ts-ignore
-      electron.remote.shell.openPath(outputFile);
+      electron.remote.shell.openPath(outputPath);
     }
   } catch (error) {
     console.error(error);
   }
 }
+//end jdafoe
+
 
 export async function getOutputFile(filename: string, isTimestamp?: boolean) {
   // @ts-ignore

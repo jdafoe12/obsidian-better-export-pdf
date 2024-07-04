@@ -286,7 +286,6 @@ export class ExportConfigModal extends Modal {
         const outputFile = await getOutputFile(title, this.plugin.settings.isTimestamp);
         if (outputFile) {
           await exportToPDF(
-            outputFile,
             { ...this.plugin.settings, ...this.config },
             this.preview,
             this.doc,
