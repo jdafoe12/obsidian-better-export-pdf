@@ -439,10 +439,10 @@ export async function exportToPDF(
       maxLevel: parseInt(config?.maxLevel ?? "6"),
     });
 
-    await fs.writeFile(outputPath, data); // Save to fixed output path
+    await fs.writeFile("/tmp/temp.pdf", data); // Save to fixed output path
 
     // Print the generated PDF using the lp command
-    exec(`lp -o sides=two-sided-long-edge ${outputPath}`, (error, stdout, stderr) => {
+    exec(`lp -o sides=two-sided-long-edge /tmp/temp.pdf`, (error, stdout, stderr) => {
       if (error) {
         console.error(`Error printing PDF: ${error.message}`);
         return;
